@@ -1,0 +1,33 @@
+# Arquivos Python
+*.pyc
+__pycache__/
+
+# Bancos de dados (se usar localmente)
+*.sqlite3
+*.db
+
+# Arquivos de variáveis de ambiente
+.env
+.env.local
+.env.development
+
+# Pastas de ambientes virtuais
+venv/
+.venv/
+env/
+.env_folder/
+
+# Arquivos de configurações locais (se usar)
+local_settings.py
+settings_local.py
+
+# Pastas de arquivos estáticos e media (se não forem versionados)
+staticfiles/
+media/
+
+### Docker ###
+docker-compose.override.yml
+.dockerenv
+
+# testes
+*.rest
