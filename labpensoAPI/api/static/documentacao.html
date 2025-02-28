@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabPenso REST API - Documentação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0;
+        }
+        h2 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            margin-top: 25px;
+            color: #2980b9;
+        }
+        .endpoint {
+            background-color: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get {
+            background-color: #61affe;
+            color: white;
+        }
+        .post {
+            background-color: #49cc90;
+            color: white;
+        }
+        .put {
+            background-color: #fca130;
+            color: white;
+        }
+        .delete {
+            background-color: #f93e3e;
+            color: white;
+        }
+        .url {
+            font-family: monospace;
+            font-size: 16px;
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .model {
+            margin-bottom: 40px;
+        }
+        .description {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .parameters {
+            margin-top: 15px;
+        }
+        .example {
+            margin-top: 15px;
+        }
+        .note {
+            background-color: #fcf8e3;
+            border-left: 4px solid #f0ad4e;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .auth-required {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .auth-optional {
+            color: #5cb85c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LabPenso REST API</h1>
+        <p>Documentação para a API de monitoramento de estações meteorológicas</p>
+    </div>
+
+    <h2>Visão Geral</h2>
+    <p>A API LabPenso REST fornece acesso a dados de estações meteorológicas, incluindo medições de temperatura, umidade, índice UV, pressão, intensidade de luz e precipitação. A API permite operações CRUD (Criar, Ler, Atualizar, Deletar) em estações meteorológicas, dias de medição e medições individuais.</p>
+
+    <div class="note">
+        <p><strong>Autenticação:</strong> Algumas operações requerem autenticação. Endpoints com permissão <span class="auth-required">IsAuthenticatedOrReadOnly</span> permitem leitura (GET) para todos os usuários, mas requerem autenticação para operações de escrita (POST, PUT, DELETE).</p>
+    </div>
+
+    <h2>Modelos de Dados</h2>
+
+    <div class="model">
+        <h3>Weather_Station (Estação Meteorológica)</h3>
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Obrigatório</th>
+            </tr>
+            <tr>
+                <td>id</td>
+                <td>Integer</td>
+                <td>Identificador único da estação</td>
+                <td>Auto-gerado</td>
+            </tr>
+            <tr>
+                <td>name</td>
+                <td>String</td>
+                <td>Nome da estação (único)</td>
+                <td>Sim</td>
+            </tr>
+            <tr>
+                <td>latitude</td>
+                <td>Float</td>
+                <td>Latitude da localização da estação</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>longitude</td>
+                <td>Float</td>
+                <td>Longitude da localização da estação</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>location</td>
+                <td>String</td>
+                <td>Descrição da localização da estação</td>
+                <td>Sim</td>
+            </tr>
+            <tr>
+                <td>description</td>
+                <td>Text</td>
+                <td>Descrição detalhada da estação</td>
+                <td>Não</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="model">
+        <h2>Day (Dia)</h2>
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Obrigatório</th>
+            </tr>
+            <tr>
+                <td>id</td>
+                <td>Integer</td>
+                <td>Identificador único do dia</td>
+                <td>Auto-gerado</td>
+            </tr>
+            <tr>
+                <td>data</td>
+                <td>Date</td>
+                <td>Data do dia (única)</td>
+                <td>Sim</td>
+            </tr>
+            <tr>
+                <td>observacao</td>
+                <td>String</td>
+                <td>Observações para o dia</td>
+                <td>Não</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="model">
+        <h2>Measurement (Medição)</h2>
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Obrigatório</th>
+            </tr>
+            <tr>
+                <td>id</td>
+                <td>Integer</td>
+                <td>Id da medição</td>
+                <td>Auto-Gerado</td>
+            </tr>
+            <tr>
+                <td>station_id</td>
+                <td>ForeignKey</td>
+                <td>Referência à estação meteorológica</td>
+                <td>Sim</td>
+            </tr>
+            <tr>
+                <td>timestamp</td>
+                <td>DateTime</td>
+                <td>Data e hora da medição</td>
+                <td>Sim</td>
+            </tr>
+            <tr>
+                <td>temperature</td>
+                <td>Float</td>
+                <td>Temperatura registrada (°C)</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>humidity</td>
+                <td>Float</td>
+                <td>Umidade registrada (%)</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>uv_index</td>
+                <td>Integer</td>
+                <td>Índice UV registrado</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>pressure</td>
+                <td>Float</td>
+                <td>Pressão atmosférica (hPa)</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>light_intensity</td>
+                <td>Float</td>
+                <td>Intensidade de luz</td>
+                <td>Não</td>
+            </tr>
+            <tr>
+                <td>rain_mm</td>
+                <td>Float</td>
+                <td>Precipitação (mm)</td>
+                <td>Não</td>
+            </tr>
+        </table>
+        <p>Observação: A combinação de Weather_Station, Day e timestamp deve ser única.</p>
+    </div>
+
+    <h2>Endpoints</h2>
+
+    <h2>Status da API</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/test/</span>
+        <div class="description">
+            <p>Retorna o status da API e informações sobre a autenticação do usuário.</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta (Não Autenticado):</h4>
+            <pre><code>{
+    "message": "LabPenso Rest online! 😉 Você não está autenticado 🔒"
+}</code></pre>
+            <h4>Exemplo de Resposta (Autenticado):</h4>
+            <pre><code>{
+    "message": "LabPenso Rest online! 😉 Você está autenticado 🔓"
+}</code></pre>
+        </div>
+    </div>
+
+    <h2>Estações Meteorológicas</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/stations/</span>
+        <div class="description">
+            <p>Retorna uma lista de todas as estações meteorológicas cadastradas.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>[
+    {
+        "id": 1,
+        "name": "Estação Central",
+        "latitude": -23.5505,
+        "longitude": -46.6333,
+        "description": "Estação localizada no centro da cidade"
+    },
+    {
+        "id": 2,
+        "name": "Estação Norte",
+        "latitude": -23.4984,
+        "longitude": -46.6476,
+        "description": "Estação localizada na zona norte"
+    }
+]</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/stations/{id}/</span>
+        <div class="description">
+            <p>Retorna detalhes de uma estação meteorológica específica.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>{
+    "id": 1,
+    "name": "Estação Central",
+    "latitude": -23.5505,
+    "longitude": -46.6333,
+    "description": "Estação localizada no centro da cidade"
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/stations/</span>
+        <div class="description">
+            <p>Cria uma nova estação meteorológica.</p>
+            <p class="auth-required">Permissão: Requer autenticação</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Requisição:</h4>
+            <pre><code>{
+    "name": "Nova Estação",
+    "latitude": -23.4567,
+    "longitude": -46.7890,
+    "location": "Zona Leste",
+    "description": "Estação experimental para monitoramento climático"
+}</code></pre>
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>{
+    "id": 3,
+    "name": "Nova Estação",
+    "latitude": -23.4567,
+    "longitude": -46.7890,
+    "description": "Estação experimental para monitoramento climático"
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method put">PUT</span>
+        <span class="url">/api/stations/{id}/</span>
+        <div class="description">
+            <p>Atualiza uma estação meteorológica existente.</p>
+            <p class="auth-required">Permissão: Requer autenticação</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Requisição:</h4>
+            <pre><code>{
+    "name": "Estação Central Atualizada",
+    "latitude": -23.5505,
+    "longitude": -46.6333,
+    "location": "Centro",
+    "description": "Estação principal atualizada com novos sensores"
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method delete">DELETE</span>
+        <span class="url">/api/stations/{id}/</span>
+        <div class="description">
+            <p>Remove uma estação meteorológica.</p>
+            <p class="auth-required">Permissão: Requer autenticação</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <h2>Dias</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/days/</span>
+        <div class="description">
+            <p>Retorna uma lista de todos os dias cadastrados.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>[
+    {
+        "id": 1,
+        "data": "2024-02-15",
+        "observacao": "Dia ensolarado"
+    },
+    {
+        "id": 2,
+        "data": "2024-02-16",
+        "observacao": "Parcialmente nublado"
+    }
+]</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/days/{id}/</span>
+        <div class="description">
+            <p>Retorna detalhes de um dia específico.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>Integer</td>
+                    <td>ID do dia</td>
+                </tr>
+            </table>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>{
+    "id": 1,
+    "data": "2024-02-15",
+    "observacao": "Dia ensolarado"
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/days/</span>
+        <div class="description">
+            <p>Cria um novo dia para medições.</p>
+            <p class="auth-required">Permissão: Requer autenticação</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Requisição:</h4>
+            <pre><code>{
+    "data": "2024-02-17",
+    "observacao": "Chuva leve pela manhã"
+}</code></pre>
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>{
+    "id": 3,
+    "data": "2024-02-17",
+    "observacao": "Chuva leve pela manhã"
+}</code></pre>
+        </div>
+    </div>
+
+    <h2>Medições</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/</span>
+        <div class="description">
+            <p>Retorna uma lista de todas as medições cadastradas.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>[
+    {
+        "id": 2,
+        "day_id": 2,
+        "weather_station_id": 1,
+        "timestamp": "2024-02-15T14:30:00Z",
+        "temperature": 28.5,
+        "humidity": 65.0,
+        "uv_index": 8,
+        "pressure": 1013.2,
+        "light_intensity": 8500.0,
+        "rain_mm": 0.0
+    },
+    {
+        "id": 2,
+        "day_id": 2,
+        "weather_station_id": 1,
+        "timestamp": "2024-02-15T15:30:00Z",
+        "temperature": 29.2,
+        "humidity": 63.5,
+        "uv_index": 9,
+        "pressure": 1012.8,
+        "light_intensity": 9000.0,
+        "rain_mm": 0.0
+    }
+]</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/measurements/</span>
+        <div class="description">
+            <p>Cria uma nova medição meteorológica.</p>
+            <p class="auth-required">Permissão: Requer autenticação</p>
+            <p>Observação: Ao criar uma medição, você pode fornecer apenas o ID da estação e o timestamp. O sistema criará ou associará automaticamente o dia correto com base no timestamp.</p>
+        </div>
+        <div class="example">
+            <h4>Exemplo de Requisição:</h4>
+            <pre><code>
+    {
+        "id": 2,
+        "station_id": 1
+        "timestamp": "2024-02-15T15:30:00Z",
+        "temperature": 29.2,
+        "humidity": 63.5,
+        "uv_index": 9,
+        "pressure": 1012.8,
+        "light_intensity": 9000.0,
+        "rain_mm": 0.0
+    }</code></pre>
+            <h4>Exemplo de Resposta:</h4>
+            <pre><code>
+    {
+        "id": 2,
+        "day_id": 2,
+        "weather_station_id": 1,
+        "timestamp": "2024-02-15T15:30:00Z",
+        "temperature": 29.2,
+        "humidity": 63.5,
+        "uv_index": 9,
+        "pressure": 1012.8,
+        "light_intensity": 9000.0,
+        "rain_mm": 0.0
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/station/{station_id}/</span>
+        <div class="description">
+            <p>Retorna todas as medições de uma estação específica.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>station_id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/day/{YYYY-MM-DD}/</span>
+        <div class="description">
+            <p>Retorna todas as medições de um dia específico.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>day</td>
+                    <td>String (YYYY-MM-DD)</td>
+                    <td>Data no formato ISO (YYYY-MM-DD)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/station/{station_id}/day/{YYYY-MM-DD}/</span>
+        <div class="description">
+            <p>Retorna todas as medições de uma estação específica em um dia específico.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>station_id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+                <tr>
+                    <td>day</td>
+                    <td>String (YYYY-MM-DD)</td>
+                    <td>Data no formato ISO (YYYY-MM-DD)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/station/{station_id}/dates/</span>
+        <div class="description">
+            <p>Retorna todas as medições de uma estação específica dentro de um intervalo de datas.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>station_id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+            <h4>Parâmetros de Query:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Obrigatório</th>
+                </tr>
+                <tr>
+                    <td>start</td>
+                    <td>String (YYYY-MM-DD)</td>
+                    <td>Data inicial do intervalo</td>
+                    <td>Sim</td>
+                </tr>
+                <tr>
+                    <td>end</td>
+                    <td>String (YYYY-MM-DD)</td>
+                    <td>Data final do intervalo</td>
+                    <td>Sim</td>
+                </tr>
+            </table>
+        </div>
+        <div class="example">
+            <h4>Exemplo de URL:</h4>
+            <pre><code>/api/measurements/station/1/dates/?start=2024-02-01&end=2024-02-15</code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/measurements/station/{station_id}/hours/</span>
+        <div class="description">
+            <p>Retorna todas as medições de uma estação específica dentro de um intervalo de horas.</p>
+            <p class="auth-optional">Permissão: Leitura permitida para todos os usuários</p>
+        </div>
+        <div class="parameters">
+            <h4>Parâmetros de URL:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>station_id</td>
+                    <td>Integer</td>
+                    <td>ID da estação meteorológica</td>
+                </tr>
+            </table>
+            <h4>Parâmetros de Query:</h4>
+            <table>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Obrigatório</th>
+                </tr>
+                <tr>
+                    <td>start</td>
+                    <td>String (ISO 8601)</td>
+                    <td>Data e hora inicial do intervalo (formato ISO 8601)</td>
+                    <td>Sim</td>
+                </tr>
+                <tr>
+                    <td>end</td>
+                    <td>String (ISO 8601)</td>
+                    <td>Data e hora final do intervalo (formato ISO 8601)</td>
+                    <td>Sim</td>
+                </tr>
+            </table>
+        </div>
+        <div class="example">
+            <h4>Exemplo de URL:</h4>
+            <pre><code>/api/measurements/station/1/hours/?start=2024-02-15T08:00:00Z&end=2024-02-15T18:00:00Z</code></pre>
+        </div>
+    </div>
+
+        <h2>Autenticação JWT - Obtenção de Token</h2>
+        <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="url">/api/token/</span>
+        <div class="description">
+        <p>Para acessar endpoints protegidos (requisições POST, PUT, PATCH, DELETE), você precisa obter um token JWT e incluí-lo no cabeçalho das suas requisições.</p>
+        </div>
+        <h3>1. Requisitar Token</h3>
+        <p>Envie uma requisição <strong>POST</strong> para <code>/api/token/</code> com as suas credenciais (usuário e senha) no formato JSON:</p>
+        <div class="code-block">
+            <pre>
+            POST /api/token/ HTTP/1.1
+            Content-Type: application/json
+
+            {
+                "username": "seu_usuario",
+                "password": "sua_senha"
+            }
+            </pre>
+        </div>
+        <p>Substitua <code>"seu_usuario"</code> e <code>"sua_senha"</code> pelas credenciais de um usuário válido do sistema (você pode criar usuários no <a href="/admin/" target="_blank">Django Admin</a>).</p>
+
+        <h3>2. Resposta - Token JWT</h3>
+        <p>Se as credenciais estiverem corretas, a API responderá com um par de tokens JWT (access e refresh token) em formato JSON:</p>
+        <div class="code-block">
+            <pre>
+            {
+                "access": "SEU_ACCESS_TOKEN_JWT",
+                "refresh": "SEU_REFRESH_TOKEN_JWT"
+            }
+            </pre>
+        </div>
+        <p>Guarde o <code>access token</code> para usar nas suas requisições protegidas.</p>
+
+        <h3>3. Incluir Token nas Requisições Protegidas</h3>
+        <p>Para fazer requisições a endpoints protegidos (ex: criar uma nova medição), inclua o <code>access token</code> no cabeçalho <code>Authorization</code> da requisição, usando o esquema <strong>Bearer</strong>:</p>
+        <div class="code-block">
+            <pre>
+            POST /api/measurements/ HTTP/1.1
+            Content-Type: application/json
+            <span class="authorization-header">Authorization: Bearer SEU_ACCESS_TOKEN_JWT</span>
+
+            {
+                "Weather_Station": "id_da_estacao",
+                "timestamp": "2024-01-01T10:00:00Z",
+                "temperature": 25.5,
+                "humidity": 60.2
+                // ... outros campos da medição ...
+            }
+            </pre>
+        </div>
+        <p>Substitua <code>SEU_ACCESS_TOKEN_JWT</code> pelo token que você obteve no passo 2.</p>
+        </div>
+
+        <h2>Refresh Token (Renovação do Access Token)</h2>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="url">/api/token/refresh</span>
+        <p>O <code>access token</code> tem um tempo de vida curto. Quando ele expirar, você receberá um erro de autenticação. Para obter um novo <code>access token</code> sem precisar autenticar novamente, use o <code>refresh token</code>:</p>
+        <div class="code-block">
+            <pre>
+            POST /api/token/refresh/ HTTP/1.1
+            Content-Type: application/json
+
+            {
+                "refresh": "SEU_REFRESH_TOKEN_JWT"
+            }
+            </pre>
+        </div>
+        <p>Envie uma requisição <strong>POST</strong> para <code>/api/token/refresh/</code> com o <code>refresh token</code> que você obteve inicialmente. A API responderá com um novo <code>access token</code>.</p>
+        </div>
+
+    <h2>Documentação da API</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">/api/docs/</span>
+        <div class="description">
+            <p>Retorna esta documentação da API em formato HTML.</p>
+        </div>
+    </div>
+
+    <div class="note">
+        <h3>Observações Importantes</h3>
+        <ul>
+            <li>Todos os endpoints que modificam dados (POST, PUT, DELETE) requerem autenticação.</li>
+            <li>Timestamps devem ser fornecidos no formato ISO 8601 (YYYY-MM-DDThh:mm:ssZ).</li>
+            <li>Ao criar uma medição, o sistema gerencia automaticamente a associação com o dia correto.</li>
+            <li>A combinação de estação, dia e timestamp deve ser única para cada medição.</li>
+        </ul>
+    </div>
+
+    <footer style="margin-top: 50px; text-align: center; color: #777; border-top: 1px solid #eee; padding-top: 20px;">
+        <p>LabPenso REST API - Documentação v1.0</p>
+        <p>&copy; 2024 LabPenso. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

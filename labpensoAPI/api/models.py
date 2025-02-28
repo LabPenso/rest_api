@@ -1,10 +1,10 @@
 from django.db import models
 
 class Weather_Station(models.Model):
-    # station_id REMOVIDO
     name = models.CharField(max_length=100, unique=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    location = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -12,7 +12,7 @@ class Weather_Station(models.Model):
 
 class Day(models.Model):
     data = models.DateField(unique=True)
-    observacao = models.CharField(max_length=200, blank=True, null=True)
+    observacao = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return str(self.data)
@@ -25,7 +25,7 @@ class Measurement(models.Model):
     humidity = models.FloatField(blank=True, null=True)
     uv_index = models.IntegerField(blank=True, null=True)
     pressure = models.FloatField(blank=True, null=True)
-    light_intensity = models.IntegerField(blank=True, null=True)
+    light_intensity = models.FloatField(blank=True, null=True)
     rain_mm = models.FloatField(blank=True, null=True)
 
     class Meta:
